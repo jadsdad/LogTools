@@ -53,7 +53,7 @@ class QuickLogForm(Ui_Dialog):
             self.cmbArt.addItem(a[0], a[0])
 
     def populateAlbCombo(self):
-        art_id = self.getSelectedArtist()
+        art_id = self.makesafe(self.getSelectedArtist())
         c = self.conn.cursor()
         c.execute("SELECT albumid, album, yearreleased from album WHERE artistcredit='{}' order by yearreleased, album;".format(art_id))
         alblist = c.fetchall()
