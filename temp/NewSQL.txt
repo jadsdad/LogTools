@@ -1,0 +1,11 @@
+CREATE TABLE `label` (
+	`LabelID` INT NOT NULL AUTO_INCREMENT,
+	`LabelName` VARCHAR(50) NULL DEFAULT NULL,
+	PRIMARY KEY (`LabelID`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+
+
