@@ -31,7 +31,7 @@ class TapeCalcForm(Ui_Dialog):
                   "FROM artist "
                   "INNER JOIN albumartist on artist.artistid = albumartist.artistid "
                   "INNER JOIN album on album.albumid = albumartist.albumid "
-                  "WHERE album.sourceid in (4, 6) AND album.AlbumTypeID <> 8 "
+                  "WHERE album.sourceid in (4) AND album.AlbumTypeID <> 8 "
                   "AND album.albumid not in (select albumid from albums_missing_tracks) "
                   "ORDER BY artistname;")
         artlist = c.fetchall()
@@ -44,7 +44,7 @@ class TapeCalcForm(Ui_Dialog):
         c = self.conn.cursor()
         c.execute("SELECT album.albumid, album from album "
                   "inner join albumartist on album.albumid = albumartist.albumid "
-                  "WHERE artistid={} and SourceID in (4, 6) AND "
+                  "WHERE artistid={} and SourceID in (4) AND "
                   "album.albumid not in (select albumid from albums_missing_tracks)"
                   "order by album;".format(art_id))
         alblist = c.fetchall()
