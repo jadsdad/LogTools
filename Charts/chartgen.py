@@ -15,40 +15,6 @@ def query_db(sql):
     cursor.execute(sql)
     return cursor.fetchall()
 
-def update_data():
-    cursor = conn.cursor()
-
-    cursor.execute("CREATE TEMPORARY TABLE rollingchart_table "
-                   "SELECT 2 as RankType, `index`, `rank`, artistid, albumid, artistname, album, logtime, logcount "
-                   "FROM chart_album_rolling "
-                   "WHERE chart_album_rolling.rank <= 20;")
-
-    cursor.execute("INSERT INTO rollingchart_table "
-                    "SELECT 1 as ranktype, `index`, `rank`, artistid, 0 as albumid, "
-                    "artistname, '' as album, logtime, logcount "
-                    "FROM chart_artist_rolling "
-                    "WHERE chart_artist_rolling.rank <= 30;")
-
-
-    conn.commit()
-
-def get_ranktypes():
-    sql = "SELECT * from ranktype;"
-    return query_db(sql)
-
-def get_last_week():
-    sql = "SELECT Max(`index`) as LastWeek from rollingchart_table;"
-    return query_db(sql)[0][0]
-
-def get_report_date(index):
-    sql = "SELECT reportdate from rolling4weeks where `index`={};".format(index)
-    row = query_db(sql)
-    return row[0][0]
-
-def get_threshold():
-    d = date.today() - timedelta(days=7)
-    return d
-
 def get_data(query, condition=None):
     sql = "SELECT ArtistName, Album, Points, Plays from {} ".format(query)
 
