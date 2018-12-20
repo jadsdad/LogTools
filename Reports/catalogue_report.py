@@ -10,7 +10,7 @@ f = None
 
 def openreportfile():
     global f
-    f = io.open(str(Path.home()) + "/Collection.txt", "w", encoding='utf-8')
+    f = io.open(str(Path.home()) + "/Charts/Collection.txt", "w", encoding='utf-8')
 
 
 def add_relationships(artistid, isgroup):
