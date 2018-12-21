@@ -9,6 +9,7 @@ import musicbrainzngs as MBrainz
 
 conn = MariaDB.connect(user='simon', passwd='phaedra74', db='catalogue', use_unicode=True, charset='utf8')
 MBrainz.set_useragent("Simon's Collection Database", "1.0")
+#MBrainz.set_hostname("beta.musicbrainz.org")
 MBrainz.auth("ecomusicaddict", "3amatBotMfO")
 
 def retrieve_numerics(src):
@@ -66,6 +67,7 @@ def obtain_relationships(mbid):
             for arl in art:
                 if 'type' in arl and arl['type'] in ['member of band', 'collaboration']:
                     assoc_artist = arl['artist']['name']
+                    print("Association found with " + assoc_artist)
                     assoc_id = find_artistid(assoc_artist)
                     if assoc_id is not None:
                         if 'begin' in arl:
@@ -110,6 +112,7 @@ def make_safe(s):
     return s.replace("'", "''")
 
 def scan(basedir):
+    release_ids = {}
     for root, dirs, files in os.walk(basedir):
         for f in files:
             if f.endswith(".ogg"):
@@ -122,6 +125,9 @@ def scan(basedir):
                 disc = str(retrieve_numerics(t["DISCNUMBER"][0]))
                 track = str(retrieve_numerics(t["tracknumber"][0]))
                 title = t["title"][0]
+
+                print("Scanning > {} - {}".format(album, title))
+
                 length_hr = int(f.info.length / 3600)
                 length_min = int((f.info.length - (length_hr * 3600)) / 60)
                 length_sec = int(f.info.length) % 60
@@ -132,10 +138,17 @@ def scan(basedir):
                     album_mbid = t["MUSICBRAINZ_RELEASEGROUPID"][0]
                 else:
                     album_mbid = get_album_mbid(album_artist, album)
-                release_record = MBrainz.get_release_group_by_id(album_mbid, includes=['artists'])['release-group']
+
                 albumid = getAlbumID(album, year, album_artist)
-                parse_artist(release_record, albumid)
+                removeStream(albumid)
+
+                if albumid not in release_ids:
+                    release_ids[albumid] = album_mbid
                 insertTrack(albumid, disc, track, title, length, filesize, bitrate, filename)
+
+    for albumid, album_mbid in release_ids.items():
+        release_record = get_release_record(album_mbid)
+        parse_artist(release_record, albumid)
 
     cursor = conn.cursor()
     procs = ["do_remap", "playcount_audit"]
@@ -143,6 +156,19 @@ def scan(basedir):
     #for p in procs:
     #    cursor.execute("CALL {};".format(p))
     #    conn.commit()
+
+def get_release_record(mbid):
+    successful = False
+    print("Obtaining release record for MBID {}".format(mbid))
+    while not successful:
+        try:
+            release_record = MBrainz.get_release_group_by_id(mbid, includes=['artists'])['release-group']
+            successful = True
+            return release_record
+        except (MBrainz.NetworkError, MBrainz.ResponseError):
+            print("Failed to get Release Record from MB. Retrying")
+
+
 
 def get_album_mbid(artistname, album):
     searchresults = MBrainz.search_release_groups(artist=artistname, release=album)
@@ -152,7 +178,15 @@ def get_album_mbid(artistname, album):
     return None
 
 def get_artist_name(mbid):
-    art_record = MBrainz.get_artist_by_id(mbid, includes='aliases')
+    successful = False
+    print("Obtaining artist record for MBID {}".format(mbid))
+    while not successful:
+        try:
+            art_record = MBrainz.get_artist_by_id(mbid, includes='aliases')
+            successful = True
+        except (MBrainz.NetworkError, MBrainz.ResponseError):
+            print("Failed to get Artist Record from MB. Retrying")
+
     if 'alias-list' in art_record['artist']:
         for alias in art_record['artist']['alias-list']:
             if 'locale' in alias:
@@ -186,6 +220,7 @@ def parse_artist(release_record, albumid):
             if 'artist' in artist:
                 artist_mbid = artist['artist']['id']
                 artistname = get_artist_name(artist_mbid)
+                print("MusicBrainz Artist: " + artistname)
                 artistcredit += artistname
                 artistid = find_artist_id(artistname, artist_mbid)
                 if not albumartist_exists(albumid, artistid):
@@ -194,6 +229,7 @@ def parse_artist(release_record, albumid):
             else:
                 artistcredit += artist
 
+    print("\tArtist Credit: " + artistcredit)
     update_artistcredit(albumid, artistcredit)
 
 def update_artistcredit(albumid, artistcredit):
@@ -229,6 +265,13 @@ def getAlbumID(album, year, albumartist):
         row = cursor.fetchone()
         return row[0]
 
+def removeStream(albumid):
+    cursor = conn.cursor()
+    sql = "UPDATE album SET AlbumTypeID=12, SourceID=NULL where albumid={};".format(albumid)
+    cursor.execute(sql)
+    conn.commit()
+
+
 def getTrackID(albumid, disc, track):
     cursor = conn.cursor()
     sql = "SELECT trackid FROM track WHERE albumid={} AND disc={} and track={};".format(albumid, disc, track)
@@ -253,5 +296,5 @@ def insertTrack(albumid, disc, track, title, length, size, bitrate, loc):
     conn.commit()
 
 if __name__ == '__main__':
-    scan("D:\\opus\\Jon Anderson\\1976 - Olias of Sunhillow\\")
-    #scan("/home/simon/Rips/Temp/")
+    #scan("D:\\opus\\Jon Anderson\\1976 - Olias of Sunhillow\\")
+    scan("/home/simon/Rips/Temp/")
