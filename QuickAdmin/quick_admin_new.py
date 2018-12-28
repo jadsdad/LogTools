@@ -120,7 +120,7 @@ class QuickAdminForm(Ui_QuickAdmin):
     def setAlbumType(self):
         alb_id = self.getSelectedAlbum()
         c = self.conn.cursor()
-        c.execute("SELECT albumtypeid, sourceid, comments "
+        c.execute("SELECT albumtypeid, sourceid, labelid, comments "
                   "from album where albumid=%s;", (alb_id, ))
         typerow = c.fetchone()
         self.cmbType.setCurrentIndex(self.cmbType.findData(typerow[0]))
