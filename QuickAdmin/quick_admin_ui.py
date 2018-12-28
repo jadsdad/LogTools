@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'quick_admin.ui'
 #
-# Created by: PyQt5 UI code generator 5.9
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -39,17 +39,21 @@ class Ui_QuickAdmin(object):
         self.cmbSource = QtWidgets.QComboBox(QuickAdmin)
         self.cmbSource.setGeometry(QtCore.QRect(120, 470, 211, 22))
         self.cmbSource.setObjectName("cmbSource")
-
         self.label_4 = QtWidgets.QLabel(QuickAdmin)
         self.label_4.setGeometry(QtCore.QRect(10, 470, 101, 16))
         self.label_4.setObjectName("label_4")
-
         self.txtEdition = QtWidgets.QLineEdit(QuickAdmin)
-        self.txtEdition.setGeometry(QtCore.QRect(120, 530, 211, 20))
+        self.txtEdition.setGeometry(QtCore.QRect(120, 540, 211, 20))
         self.txtEdition.setObjectName("txtEdition")
         self.label_6 = QtWidgets.QLabel(QuickAdmin)
-        self.label_6.setGeometry(QtCore.QRect(10, 530, 101, 16))
+        self.label_6.setGeometry(QtCore.QRect(10, 540, 101, 16))
         self.label_6.setObjectName("label_6")
+        self.label_5 = QtWidgets.QLabel(QuickAdmin)
+        self.label_5.setGeometry(QtCore.QRect(10, 500, 101, 16))
+        self.label_5.setObjectName("label_5")
+        self.cmbLabel = QtWidgets.QComboBox(QuickAdmin)
+        self.cmbLabel.setGeometry(QtCore.QRect(120, 500, 211, 22))
+        self.cmbLabel.setObjectName("cmbLabel")
 
         self.retranslateUi(QuickAdmin)
         QtCore.QMetaObject.connectSlotsByName(QuickAdmin)
@@ -62,6 +66,7 @@ class Ui_QuickAdmin(object):
         self.label_3.setText(_translate("QuickAdmin", "Type:"))
         self.label_4.setText(_translate("QuickAdmin", "Source"))
         self.label_6.setText(_translate("QuickAdmin", "Edition Notes:"))
+        self.label_5.setText(_translate("QuickAdmin", "Label"))
 
 
 if __name__ == "__main__":

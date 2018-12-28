@@ -256,8 +256,8 @@ def getAlbumID(album, year, albumartist):
           "AND yearreleased={};".format(make_safe(album), make_safe(albumartist), year)
     result = cursor.execute(sql)
     if result == 0:
-        sql = "INSERT INTO album (album, yearreleased, albumtypeid, audit, artistcredit) " \
-              "VALUES ('{}', {}, 12, 1, '{}');".format(make_safe(album), year, make_safe(albumartist))
+        sql = "INSERT INTO album (album, yearreleased, albumtypeid, audit, artistcredit, labelid) " \
+              "VALUES ('{}', {}, 12, 1, '{}', 67);".format(make_safe(album), year, make_safe(albumartist))
         cursor.execute(sql)
         conn.commit()
         return cursor.lastrowid

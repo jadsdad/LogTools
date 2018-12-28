@@ -18,7 +18,7 @@ class QuickAdminForm(Ui_QuickAdmin):
         self.populateAlbCombo()
         self.populateTypeCombo()
         self.populateSourceCombo()
-
+        self.populateLabelCombo()
         self.populateAlbumDetails()
         self.setTrackHeaders()
 
@@ -26,6 +26,7 @@ class QuickAdminForm(Ui_QuickAdmin):
         self.cmbAlb.currentIndexChanged.connect(self.populateAlbumDetails)
         self.tableTracks.itemChanged.connect(self.updateTrackData)
         self.cmbType.currentIndexChanged.connect(self.updateAlbumType)
+        self.cmbLabel.currentIndexChanged.connect(self.updateAlbumLabel)
         self.cmbSource.currentIndexChanged.connect(self.updateSource)
         self.txtEdition.textChanged.connect(self.updateEdition)
 
@@ -53,6 +54,14 @@ class QuickAdminForm(Ui_QuickAdmin):
         sql = "UPDATE album SET sourceid = %s WHERE albumid = %s;"
         cursor = self.conn.cursor()
         cursor.execute(sql, (typeid, alb_id, ))
+        self.conn.commit()
+
+    def updateAlbumLabel(self):
+        alb_id = self.getSelectedAlbum()
+        labelid = int(self.cmbLabel.itemData(self.cmbLabel.currentIndex()))
+        sql = "UPDATE album SET labelid = %s WHERE albumid = %s;"
+        cursor = self.conn.cursor()
+        cursor.execute(sql, (labelid, alb_id, ))
         self.conn.commit()
 
     def updateTrackData(self, item):
@@ -100,12 +109,13 @@ class QuickAdminForm(Ui_QuickAdmin):
     def setAlbumType(self):
         alb_id = self.getSelectedAlbum()
         c = self.conn.cursor()
-        c.execute("SELECT albumtypeid, sourceid, comments "
+        c.execute("SELECT albumtypeid, sourceid, labelid, comments "
                   "from album where albumid=%s;", (alb_id, ))
         typerow = c.fetchone()
         self.cmbType.setCurrentIndex(self.cmbType.findData(typerow[0]))
         self.cmbSource.setCurrentIndex(self.cmbSource.findData(typerow[1]))
-        self.txtEdition.setText(typerow[2])
+        self.cmbLabel.setCurrentIndex(self.cmbLabel.findData(typerow[2]))
+        self.txtEdition.setText(typerow[3])
 
     def populateArtCombo(self):
         c = self.conn.cursor()
@@ -135,6 +145,14 @@ class QuickAdminForm(Ui_QuickAdmin):
 
         for a in typelist:
             self.cmbType.addItem(a[1], a[0])
+
+    def populateLabelCombo(self):
+        c = self.conn.cursor()
+        c.execute("SELECT distinct labelid, label from label order by label;")
+        artlist = c.fetchall()
+        if artlist is not None:
+            for a in artlist:
+                self.cmbLabel.addItem(a[1], a[0])
 
     def populateSourceCombo(self):
         c = self.conn.cursor()
