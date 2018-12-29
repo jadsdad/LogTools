@@ -29,7 +29,9 @@ class QuickAdminForm(Ui_QuickAdmin):
         self.cmbLabel.currentIndexChanged.connect(self.updateAlbumLabel)
         self.cmbSource.currentIndexChanged.connect(self.updateSource)
         self.txtEdition.textChanged.connect(self.updateEdition)
+        self.cmdSaveLabel.clicked.connect(self.addNewLabel)
 
+        self.labelComboRefreshing = False
 
 
     def updateEdition(self):
@@ -57,12 +59,13 @@ class QuickAdminForm(Ui_QuickAdmin):
         self.conn.commit()
 
     def updateAlbumLabel(self):
-        alb_id = self.getSelectedAlbum()
-        labelid = int(self.cmbLabel.itemData(self.cmbLabel.currentIndex()))
-        sql = "UPDATE album SET labelid = %s WHERE albumid = %s;"
-        cursor = self.conn.cursor()
-        cursor.execute(sql, (labelid, alb_id, ))
-        self.conn.commit()
+        if not self.labelComboRefreshing:
+            alb_id = self.getSelectedAlbum()
+            labelid = int(self.cmbLabel.itemData(self.cmbLabel.currentIndex()))
+            sql = "UPDATE album SET labelid = %s WHERE albumid = %s;"
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (labelid, alb_id, ))
+            self.conn.commit()
 
     def updateTrackData(self, item):
         alb_id = self.getSelectedAlbum()
@@ -106,6 +109,25 @@ class QuickAdminForm(Ui_QuickAdmin):
         else:
             return None
 
+    @staticmethod
+    def makeSafe(text):
+        return text.replace("'", "''")
+
+    def labelExists(self, label):
+        c = self.conn.cursor()
+        rowcount = c.execute("SELECT * from label where label = '{}';".format(self.makeSafe(label)))
+        return rowcount > 0
+
+    def addNewLabel(self):
+        label = self.txtAddNewLabel.text()
+        if not self.labelExists(label) and not label == '':
+            sql = "INSERT INTO label(label) values ('{}')".format(self.makeSafe(label))
+            cursor = self.conn.cursor()
+            cursor.execute(sql)
+            self.conn.commit()
+            self.populateLabelCombo()
+            self.txtAddNewLabel.clear()
+
     def setAlbumType(self):
         alb_id = self.getSelectedAlbum()
         c = self.conn.cursor()
@@ -147,12 +169,19 @@ class QuickAdminForm(Ui_QuickAdmin):
             self.cmbType.addItem(a[1], a[0])
 
     def populateLabelCombo(self):
+        current_value = self.cmbLabel.itemData(self.cmbLabel.currentIndex())
+        self.labelComboRefreshing = True
+        self.cmbLabel.clear()
         c = self.conn.cursor()
         c.execute("SELECT distinct labelid, label from label order by label;")
         artlist = c.fetchall()
+
         if artlist is not None:
             for a in artlist:
                 self.cmbLabel.addItem(a[1], a[0])
+
+        self.cmbLabel.setCurrentIndex(self.cmbLabel.findData(current_value))
+        self.labelComboRefreshing = False
 
     def populateSourceCombo(self):
         c = self.conn.cursor()

@@ -43,10 +43,10 @@ class Ui_QuickAdmin(object):
         self.label_4.setGeometry(QtCore.QRect(10, 470, 101, 16))
         self.label_4.setObjectName("label_4")
         self.txtEdition = QtWidgets.QLineEdit(QuickAdmin)
-        self.txtEdition.setGeometry(QtCore.QRect(120, 540, 211, 20))
+        self.txtEdition.setGeometry(QtCore.QRect(120, 560, 211, 20))
         self.txtEdition.setObjectName("txtEdition")
         self.label_6 = QtWidgets.QLabel(QuickAdmin)
-        self.label_6.setGeometry(QtCore.QRect(10, 540, 101, 16))
+        self.label_6.setGeometry(QtCore.QRect(10, 560, 101, 16))
         self.label_6.setObjectName("label_6")
         self.label_5 = QtWidgets.QLabel(QuickAdmin)
         self.label_5.setGeometry(QtCore.QRect(10, 500, 101, 16))
@@ -54,6 +54,15 @@ class Ui_QuickAdmin(object):
         self.cmbLabel = QtWidgets.QComboBox(QuickAdmin)
         self.cmbLabel.setGeometry(QtCore.QRect(120, 500, 211, 22))
         self.cmbLabel.setObjectName("cmbLabel")
+        self.label_7 = QtWidgets.QLabel(QuickAdmin)
+        self.label_7.setGeometry(QtCore.QRect(10, 530, 101, 16))
+        self.label_7.setObjectName("label_7")
+        self.txtAddNewLabel = QtWidgets.QLineEdit(QuickAdmin)
+        self.txtAddNewLabel.setGeometry(QtCore.QRect(120, 530, 211, 20))
+        self.txtAddNewLabel.setObjectName("txtAddNewLabel")
+        self.cmdSaveLabel = QtWidgets.QPushButton(QuickAdmin)
+        self.cmdSaveLabel.setGeometry(QtCore.QRect(340, 530, 101, 24))
+        self.cmdSaveLabel.setObjectName("cmdSaveLabel")
 
         self.retranslateUi(QuickAdmin)
         QtCore.QMetaObject.connectSlotsByName(QuickAdmin)
@@ -67,6 +76,8 @@ class Ui_QuickAdmin(object):
         self.label_4.setText(_translate("QuickAdmin", "Source"))
         self.label_6.setText(_translate("QuickAdmin", "Edition Notes:"))
         self.label_5.setText(_translate("QuickAdmin", "Label"))
+        self.label_7.setText(_translate("QuickAdmin", "Add New Label:"))
+        self.cmdSaveLabel.setText(_translate("QuickAdmin", "Save + Refresh"))
 
 
 if __name__ == "__main__":
