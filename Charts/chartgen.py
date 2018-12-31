@@ -25,35 +25,37 @@ def get_data(query, condition=None):
 
     return query_db(sql)
 
-def generate_chart(outfile, data):
-    f = io.open(os.path.join(basedir, outfile), "w", encoding='utf-8')
-    f.write(seperator)
-
-    rank = 1
-    for dataline in data:
-        textline = ""
-        art = dataline[0][:40]
-        alb = dataline[1][:40]
-        logtime = dataline[2]
-        logcount = dataline[3]
-
-        if alb is None:
-            textline = "{:<5}{:<80}{:>10}\n".format(rank, art.upper(), logtime)
-        else:
-            textline = "{:<5}{:<40}{:<40}{:>10}{:>5}\n".format(rank, art.upper(), alb, logtime, logcount)
-
-        f.write(textline)
+def generate_chart(outfile, data, basedir):
+    if len(data) > 0:
+        f = io.open(os.path.join(basedir, outfile), "w", encoding='utf-8')
         f.write(seperator)
-        rank += 1
 
-    f.flush()
-    f.close()
+        rank = 1
+        for dataline in data:
+            textline = ""
+            art = dataline[0][:40]
+            alb = dataline[1][:40]
+            logtime = dataline[2]
+            logcount = dataline[3]
+
+            if alb is None:
+                textline = "{:<5}{:<80}{:>10}\n".format(rank, art.upper(), logtime)
+            else:
+                textline = "{:<5}{:<40}{:<40}{:>10}{:>5}\n".format(rank, art.upper(), alb, logtime, logcount)
+
+            f.write(textline)
+            f.write(seperator)
+            rank += 1
+
+        f.flush()
+        f.close()
 
 def run():
-    generate_chart("Artist Chart.txt", get_data("chart_artist_alltime"))
-    generate_chart("Album Chart.txt", get_data("chart_album_alltime"))
+
+    generate_chart("Artist Chart.txt", get_data("chart_artist_alltime"), basedir)
+    generate_chart("Album Chart.txt", get_data("chart_album_alltime"), basedir)
     for y in range(2018, date.today().year + 1):
-        generate_chart("Album Chart - {}.txt".format(y), get_data("charts_yearly", "YearReleased={}".format(y)))
+        generate_chart("Album Chart - {}.txt".format(y), get_data("charts_yearly", "YearReleased={}".format(y)), basedir + "/Yearly")
 
 if __name__ == '__main__':
     run()

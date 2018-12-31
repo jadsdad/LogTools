@@ -397,6 +397,11 @@ def monthly_stats():
 
     f.write("\n\n")
 
+def missing_logs_year(y):
+    sql = "select count(*) as Count from log_reimport " \
+          "WHERE YEAR(logdate) = {} AND input is null;".format(y)
+    result = get_results(sql)
+    return result[0][0]
 
 def missing_logs_week(y, w):
     sql = "select count(*) as Count from log_reimport " \
@@ -431,6 +436,33 @@ def weekly_stats():
         missing = missing_logs_week(r[0],r[1])
         count = int(r[3])
         logtime = r[2]
+        avg = ((logtime * 60) / count)
+        total = count + missing
+        line = "{:<30}{:>10}{:>10.2f}{:>20.2f}{:>11}{:>11}\n".format(y, count, logtime, avg, missing, total)
+
+        f.write(line)
+
+        if r[1] % 13 == 0:
+            f.write("-" * 105 + "\n")
+
+    f.write("\n\n")
+
+def annual_stats():
+    global albumcount
+    global logcount
+
+    f.write("{:<30}{:>10}{:>10}{:>20}{:>11}{:>11}\n".format("Annual Stats", "Count", "Hrs", "Avg. Len (min)", "Missing", "Total"))
+    f.write("-" * 105 + "\n")
+    sql = "select year(`log`.`logDate`) as Y, sum(`albumlengths`.`albumlength`) / 3600 AS `time`, count(`log`.`logID`) AS `logcount` " \
+          "from `log` inner join `albumlengths` on `log`.`AlbumID` = `albumlengths`.`albumid` inner join album on albumlengths.albumid = album.albumid " \
+          "where album.sourceid <> 6 group by Y order by Y"
+    results = get_results(sql)
+
+    for r in results:
+        y = r[0]
+        missing = missing_logs_year(y)
+        count = int(r[2])
+        logtime = r[1]
         avg = ((logtime * 60) / count)
         total = count + missing
         line = "{:<30}{:>10}{:>10.2f}{:>20.2f}{:>11}{:>11}\n".format(y, count, logtime, avg, missing, total)
@@ -716,6 +748,7 @@ def main():
     f.write("TIME PERIOD\n")
     f.write("*" * 105 + "\n\n")
 
+    annual_stats()
     monthly_stats()
     weekly_stats()
     thisweek_stats()
