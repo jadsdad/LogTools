@@ -92,7 +92,7 @@ def albums_by_label():
     f.write("{:<30}{:>10}{:>11}{:>10}{:>11}{:>10}{:>11}{:>10}\n".format("by Label", "Count", "%", "Plays", "%", "Played", "%", "Ratio"))
     f.write("-" * 105 + "\n")
     sql = "SELECT Label, COUNT(albumid) as TypeCount, SUM(playcount) as PlayCount, SUM(played) as Played FROM album inner join albumtype on " \
-          "album.albumtypeid = albumtype.albumtypeid inner join label on album.labelid = label.labelid where Label is not null GROUP BY Label ORDER BY TypeCount desc limit 20;"
+          "album.albumtypeid = albumtype.albumtypeid inner join label on album.labelid = label.labelid where Label is not null and albumtype.albumtypeid <> 16 GROUP BY Label ORDER BY TypeCount desc limit 20;"
     results = get_results(sql)
 
     for r in results:
@@ -377,7 +377,7 @@ def monthly_stats():
 
     f.write("{:<30}{:>10}{:>10}{:>20}{:>11}{:>11}\n".format("by Month", "Count", "Hrs", "Avg. Len (min)", "Missing", "Total"))
     f.write("-" * 105 + "\n")
-    sql = "select * FROM (SELECT * from listen_permonth where (Y>=2018) AND (Y = YEAR(CURRENT_DATE) AND M<>MONTH(CURRENT_DATE)) ORDER BY Y,M DESC LIMIT 24) rr ORDER BY Y,M ASC;"
+    sql = "select * FROM (SELECT * from listen_permonth where (Y>=2018) OR (Y = YEAR(CURRENT_DATE) AND M<>MONTH(CURRENT_DATE)) ORDER BY Y,M DESC LIMIT 24) rr ORDER BY Y,M ASC;"
 
     results = get_results(sql)
 
@@ -427,7 +427,7 @@ def weekly_stats():
 
     f.write("{:<30}{:>10}{:>10}{:>20}{:>11}{:>11}\n".format("by Week", "Count", "Hrs", "Avg. Len (min)", "Missing", "Total"))
     f.write("-" * 105 + "\n")
-    sql = "select * FROM (SELECT * from listen_perweek where (Y>=2018) AND (Y = YEAR(CURRENT_DATE) AND W<>WEEK(CURRENT_DATE)+1) ORDER BY Y,W DESC LIMIT 26) rr ORDER BY Y,W ASC;"
+    sql = "select * FROM (SELECT * from listen_perweek where (Y>=2018) OR (Y = YEAR(CURRENT_DATE) AND W<>WEEK(CURRENT_DATE)+1) ORDER BY Y,W DESC LIMIT 26) rr ORDER BY Y,W ASC;"
 
     results = get_results(sql)
 
