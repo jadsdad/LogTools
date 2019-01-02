@@ -2,6 +2,9 @@ import MySQLdb as MariaDB
 import io
 import os
 import sys
+import os
+from pathlib import Path
+
 conn = MariaDB.connect(user='simon', passwd='phaedra74', db='catalogue', use_unicode=True, charset='utf8')
 
 f = None
@@ -9,15 +12,12 @@ f = None
 albumcount = 0
 logcount = 0
 albumsplayed = 0
+basedir = str(Path.home()) + "/Charts"
 
 
 def openreportfile():
     global f
-
-    if sys.platform.startswith('linux'):
-        f = io.open("/home/simon/Charts/Stats.txt", "w", encoding='utf-8')
-    else:
-        f = io.open("Stats.txt", "w", encoding='utf-8')
+    f = io.open(os.path.join(basedir, "Stats.txt"), "w", encoding='utf-8')
 
 def get_results(sql):
     c = conn.cursor()

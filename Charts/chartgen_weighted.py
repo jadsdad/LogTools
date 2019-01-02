@@ -24,6 +24,29 @@ def get_total_plays():
     results = get_results(sql)
     return results[0][0]
 
+def get_total_albums():
+    sql = "SELECT COUNT(*) FROM album where SourceID<>6;"
+    results = get_results(sql)
+    return results[0][0]
+
+def get_albums_by_artist(artistname):
+    sql = "SELECT COUNT(album.albumid) " \
+          "FROM album " \
+          "INNER JOIN albumartist ON album.albumid = albumartist.albumid " \
+          "INNER JOIN artist on albumartist.artistid = artist.artistid " \
+          "WHERE SourceID<>6 and artist.artistname='{}';".format(artistname.replace("'","''"))
+    results = get_results(sql)
+    return results[0][0]
+
+def get_played_by_artist(artistname):
+    sql = "SELECT SUM(album.played) " \
+          "FROM album " \
+          "INNER JOIN albumartist ON album.albumid = albumartist.albumid " \
+          "INNER JOIN artist on albumartist.artistid = artist.artistid " \
+          "WHERE SourceID<>6 and artist.artistname='{}';".format(artistname.replace("'","''"))
+    results = get_results(sql)
+    return results[0][0]
+
 def get_total_time():
     sql = "SELECT SUM(length) FROM track where bonustrack = 0;"
     results = get_results(sql)
@@ -46,8 +69,9 @@ def get_data(query, condition=None):
     return query_db(sql)
 
 def generate_chart(outfile, data, basedir):
-    totalplays = get_total_plays()
-    totaltime = get_total_time()
+    totalplays = int(get_total_plays())
+    totaltime = int(get_total_time())
+    totalalbums = int(get_total_albums())
 
     if len(data) > 0:
         f = io.open(os.path.join(basedir, outfile), "w", encoding='utf-8')
@@ -57,9 +81,13 @@ def generate_chart(outfile, data, basedir):
         for dataline in data:
             textline = ""
             art = dataline[0][:40]
-            logtime = dataline[2]
-            logcount = dataline[3]
-            weighted_score = (((logtime / totaltime) * Decimal(0.50)) * 100) + (((logcount / totalplays) * Decimal(0.50)) * 100) * 1000
+            logtime = int(dataline[2])
+            logcount = int(dataline[3])
+            albcount = int(get_albums_by_artist(art))
+            artplayed = int(get_played_by_artist(art))
+            weighted_score = (((logtime / totaltime) * 0.5) + \
+                             ((logcount / totalplays) * 0.5)) * 100000
+
             datadict[art] = weighted_score
 
         s = [(k, datadict[k]) for k in sorted(datadict, key=datadict.get, reverse=True)]

@@ -41,7 +41,7 @@ def generate_chart(outfile, data, basedir):
             if alb is None:
                 textline = "{:<5}{:<80}{:>10}\n".format(rank, art.upper(), logtime)
             else:
-                textline = "{:<5}{:<40}{:<40}{:>10}{:>5}\n".format(rank, art.upper(), alb, logtime, logcount)
+                textline = "{:<5}{:<80}{:>10} pts\n{:<5}{:<80}{:>10} pls\n".format(rank, art.upper(), logtime, '', alb, logcount)
 
             f.write(textline)
             f.write(seperator)
