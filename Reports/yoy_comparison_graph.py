@@ -13,13 +13,14 @@ def query_db(sql):
     return cursor.fetchall()
 
 def get_weekstats(y):
-    sql = "SELECT * FROM listen_perweek where Y = {} and w between 2 and 52 order by w;".format(y)
+    sql = "SELECT * FROM listen_permonth where Y = {} order by m;".format(y)
     results = query_db(sql)
     return results
 
 outfile = str(Path.home()) + "/Charts/YOY Comparison.pdf"
 
-weekrange=range(2, 53)
+monthrange=range(1, 12)
+total = []
 
 for y in range(2018, date.today().year + 1):
     dataplot = []
@@ -30,13 +31,18 @@ for y in range(2018, date.today().year + 1):
         t = d[2]
         weekplot.append(w)
         dataplot.append(t)
+        total.append(t)
     plt.plot(weekplot, dataplot, label=y)
-    plt.legend()
+
+
+monthly_average = sum(total) / len(total)
 
 plt.title("Year-on-Year Comparison")
 plt.xlabel("Calendar Week")
 plt.ylabel("Time (hours)")
-plt.grid(True)
-plt.axis(xmin=1, xmax=53)
-plt.axvline(x=11, color='red', linestyle='--', lw=0.5)
-plt.savefig(outfile, format="pdf")
+plt.grid(axis='x', color='lightgrey', linestyle='--', markevery=3)
+plt.grid(axis='y', color='lightgrey', linestyle='--')
+plt.axis(xmin=1, xmax=12)
+plt.axhline(y=monthly_average, color='red', linestyle='--', lw=0.5)
+plt.legend(fontsize='x-small')
+plt.savefig(outfile, dpi=1200, format="pdf")
