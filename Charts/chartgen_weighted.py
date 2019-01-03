@@ -48,7 +48,7 @@ def get_played_by_artist(artistname):
     return results[0][0]
 
 def get_total_time():
-    sql = "SELECT SUM(length) FROM track where bonustrack = 0;"
+    sql = "SELECT SUM(tracklength) FROM tracklengths where bonustrack = 0;"
     results = get_results(sql)
     return results[0][0]
 
