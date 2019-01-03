@@ -14,14 +14,7 @@ class QuickLogForm(Ui_Dialog):
         Ui_Dialog.__init__(self)
         self.setupUi(ui)
 
-        if platform.system() == 'Linux':
-            user = 'simon'
-            password = 'phaedra74'
-        else:
-            user = 'root'
-            password = '3amatBotMfO'
-
-        self.conn = MariaDB.connect(user=user, passwd=password, db='catalogue', use_unicode=True, charset='utf8')
+        self.conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8')
         self.logDate.setDate(QtCore.QDate.currentDate())
         self.populateArtCombo()
         self.populateAlbCombo()
