@@ -7,10 +7,9 @@ import os
 import musicbrainzngs as MBrainz
 
 
-conn = MariaDB.connect(user='simon', passwd='phaedra74', db='catalogue', use_unicode=True, charset='utf8')
+conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8')
 MBrainz.set_useragent("Simon's Collection Database", "1.0")
 #MBrainz.set_hostname("beta.musicbrainz.org")
-MBrainz.auth("ecomusicaddict", "3amatBotMfO")
 
 def retrieve_numerics(src):
     numerics = re.findall("\d+", src)

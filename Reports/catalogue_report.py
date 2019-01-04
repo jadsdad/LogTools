@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from datetime import date
 
-conn = MariaDB.connect(user='simon', passwd='phaedra74', db='catalogue', use_unicode=True, charset='utf8')
+conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8')
 
 f = None
 

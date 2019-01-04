@@ -8,7 +8,7 @@ from datetime import date, timedelta
 from decimal import *
 
 basedir = str(Path.home()) + "/Charts"
-conn = mariadb.connect(user='root', passwd='3amatBotMfO', db='catalogue', use_unicode=True, charset='utf8')
+conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8')
 seperator = "-" * 100 + "\n"
 totalplays = 0
 totaltime = 0
@@ -48,7 +48,7 @@ def get_played_by_artist(artistname):
     return results[0][0]
 
 def get_total_time():
-    sql = "SELECT SUM(length) FROM track where bonustrack = 0;"
+    sql = "SELECT SUM(tracklength) FROM tracklengths where bonustrack = 0;"
     results = get_results(sql)
     return results[0][0]
 

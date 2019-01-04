@@ -5,7 +5,7 @@ import sys
 from tapecalcui import Ui_Dialog
 from PyQt5 import QtCore, QtWidgets
 
-conn = mariadb.connect(user='root', passwd='3amatBotMfO', db='catalogue', use_unicode=True, charset='utf8')
+conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8')
 
 class TapeCalcForm(Ui_Dialog):
     def __init__(self, ui, conn):

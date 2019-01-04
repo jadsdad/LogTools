@@ -5,7 +5,7 @@ from datetime import timedelta
 from pathlib import Path
 import io
 
-conn = MariaDB.connect(user='simon', passwd='phaedra74', db='catalogue', use_unicode=True, charset='utf8')
+conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8')
 
 
 def analyse_tracks(albumid):

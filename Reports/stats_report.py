@@ -5,7 +5,7 @@ import sys
 import os
 from pathlib import Path
 
-conn = MariaDB.connect(user='simon', passwd='phaedra74', db='catalogue', use_unicode=True, charset='utf8')
+conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8')
 
 f = None
 
@@ -679,12 +679,14 @@ def total_albums_played():
     return results[0][0]
 
 def total_time():
-    sql = "SELECT SUM(length) FROM track;"
+    sql = "SELECT SUM(tracklength) FROM tracklengths inner join album on tracklengths.albumid = album.albumid " \
+          "where album.sourceid<>6;"
     results = get_results(sql)
     return results[0][0]
 
 def total_excl_bonus():
-    sql = "SELECT SUM(length) FROM track where BonusTrack = 0;"
+    sql = "SELECT SUM(tracklength) FROM tracklengths inner join album on tracklengths.albumid = album.albumid " \
+          "where album.sourceid<> 6 and BonusTrack = 0;"
     results = get_results(sql)
     return results[0][0]
 
