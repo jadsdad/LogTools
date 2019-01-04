@@ -32,7 +32,7 @@ def analyse_tracks(albumid):
 def get_albumlist():
     sql = "SELECT artist.artistname, album.albumid, yearreleased, album FROM album " \
           "INNER JOIN albumartist on album.albumid = albumartist.albumid " \
-          "INNER JOIN artist on albumartist.artistid = artist.artistid " \
+          "INNER JOIN artist on albumartist.artistid = artist.artistid where sourceid <> 6 " \
           "order by artistname, yearreleased, album;"
     cursor = conn.cursor()
     cursor.execute(sql)

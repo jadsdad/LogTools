@@ -141,7 +141,7 @@ def albums_requiring_rerip():
     f.write("{:<80}{:>10}\n".format("Requiring Re-Rip/Re-Import", "Plays"))
     f.write("-" * 105 + "\n")
     sql = "select artistname, title, count(*) as Plays from log_reimport lr where lr.input is null and lr.requires_rerip = 1 " \
-          "group by artistname, title order by plays desc, artistname, title LIMIT 20"
+          "group by artistname, title order by plays desc, artistname, title"
 
     results = get_results(sql)
 
