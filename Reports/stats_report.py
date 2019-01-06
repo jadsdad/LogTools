@@ -352,12 +352,12 @@ def top_ten_artists_time_total():
 
     f.write("{:<30}{:>10}{:>11}\n".format("by Time Total", "Count", "Hours"))
     f.write("-" * 80 + "\n")
-    sql = "select artistname, albumcount, sum(albumlength) / 3600 as hours from " \
+    sql = "select artistname, count(album.albumid) as albums, sum(albumlength) / 3600 as hours from " \
           "albumlengths inner join album on albumlengths.albumid = album.albumid " \
           "inner join albumartist on album.albumid = albumartist.albumid " \
           "inner join artist on albumartist.artistid = artist.artistid " \
           "where album.sourceid<>6 " \
-          "group by artistname, albumcount order by hours desc limit 10;"
+          "group by artistname order by hours desc limit 10;"
 
     results = get_results(sql)
     for r in results:
