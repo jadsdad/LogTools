@@ -96,6 +96,13 @@ def add_relationship(parentid, childid, startdate, enddate):
         print("Relationship added - #{} to #{}".format(parentid, childid))
 
 
+def post_scan():
+    queries = ["CALL log_reimport;","CALL playcount_audit;"]
+
+    for sql in queries:
+        c = conn.cursor()
+        c.execute(sql)
+        conn.commit()
 
 def obtain_sortname(artistname):
     is_group = False
@@ -149,12 +156,7 @@ def scan(basedir):
         release_record = get_release_record(album_mbid)
         parse_artist(release_record, albumid)
 
-    cursor = conn.cursor()
-    procs = ["do_remap", "playcount_audit"]
-
-    #for p in procs:
-    #    cursor.execute("CALL {};".format(p))
-    #    conn.commit()
+    post_scan()
 
 def get_release_record(mbid):
     successful = False
