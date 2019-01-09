@@ -97,7 +97,7 @@ def add_relationship(parentid, childid, startdate, enddate):
 
 
 def post_scan():
-    queries = ["CALL log_reimport;","CALL playcount_audit;"]
+    queries = ["CALL import_new_logs;","CALL playcount_audit;"]
 
     for sql in queries:
         c = conn.cursor()
@@ -268,7 +268,7 @@ def getAlbumID(album, year, albumartist):
 
 def removeStream(albumid):
     cursor = conn.cursor()
-    sql = "UPDATE album SET AlbumTypeID=12, SourceID=NULL where albumid={};".format(albumid)
+    sql = "UPDATE album SET AlbumTypeID=12, DateAdded=NOW(), SourceID=NULL where albumid={} AND albumtypeid=16;".format(albumid)
     cursor.execute(sql)
     conn.commit()
 

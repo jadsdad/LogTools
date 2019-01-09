@@ -240,6 +240,41 @@ def albums_by_length():
 
     f.write("\n\n")
 
+def albums_played_last_14days():
+    sql = "select artistcredit, album, logdate from log_history where logdate > (DATE_SUB(CURRENT_DATE, INTERVAL 14 DAY))"
+
+    results = get_results(sql)
+    last_log_date = None
+    for r in results:
+        artistname = shorten_by_word(r[0], 35)
+        album = shorten_by_word(r[1], 35)
+        logdate = r[2]
+        if logdate != last_log_date:
+            f.write("\n" + ("-" * 5) + " " + str(logdate) + " " + ("-" * 88) + "\n\n")
+        last_log_date = logdate
+        line = "{:<40}{:<40}\n".format(artistname.upper(), album)
+
+        f.write(line)
+    f.write("\n\n")
+
+
+def albums_added_last_14days():
+    sql = "select artistcredit, album, date(dateadded), source from recent_additions where dateadded > (DATE_SUB(CURRENT_DATE, INTERVAL 14 DAY))"
+
+    results = get_results(sql)
+    last_log_date = None
+    for r in results:
+        artistname = shorten_by_word(r[0], 35)
+        album = shorten_by_word(r[1], 35)
+        logdate = r[2]
+        source = r[3]
+        if logdate != last_log_date:
+            f.write("\n" + ("-" * 5) + " " + str(logdate) + " " + ("-" * 88) + "\n\n")
+        last_log_date = logdate
+        line = "{:<40}{:<40}{:<10}\n".format(artistname.upper(), album, source)
+
+        f.write(line)
+    f.write("\n\n")
 
 # RE-RIP / RE-IMPORT
 
@@ -359,7 +394,7 @@ def top_ten_albums_last_28days():
           "join `albumlengths` on((`album`.`AlbumID` = `albumlengths`.`albumid`))) " \
           "join `log` on((`log`.`AlbumID` = `album`.`AlbumID`))) " \
           "join `albumtype` on((`album`.`AlbumTypeID` = `albumtype`.`AlbumTypeID`))) " \
-          "where log.logDate >= (DATE_SUB(CURRENT_DATE, INTERVAL 28 DAY)) and album.sourceid<>6 " \
+          "where log.logDate > (DATE_SUB(CURRENT_DATE, INTERVAL 28 DAY)) and album.sourceid<>6 " \
           "group by `artist`.`ArtistID`,`album`.`AlbumID`,`artist`.`ArtistName`,`album`.`Album` " \
           "order by sum(`albumlengths`.`albumlength`) desc limit 10"
 
@@ -791,6 +826,19 @@ def main():
     f.write("*" * 105 + "\n\n")
 
     albums_requiring_rerip()
+
+    f.write("\n\n" + ("*" * 105) + "\n")
+    f.write("NEW ADDITIONS\n")
+    f.write("*" * 105 + "\n\n")
+
+    albums_added_last_14days()
+
+
+    f.write("\n\n" + ("*" * 105) + "\n")
+    f.write("HISTORY\n")
+    f.write("*" * 105 + "\n\n")
+
+    albums_played_last_14days()
 
     f.flush()
     f.close()
