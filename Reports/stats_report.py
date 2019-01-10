@@ -259,18 +259,18 @@ def albums_played_last_14days():
 
 
 def albums_added_last_14days():
-    sql = "select artistcredit, album, date(dateadded), source from recent_additions where dateadded > (DATE_SUB(CURRENT_DATE, INTERVAL 14 DAY))"
+    sql = "select artistcredit, album, datepurchased, source from recent_additions where datepurchased > (DATE_SUB(CURRENT_DATE, INTERVAL 28 DAY))"
 
     results = get_results(sql)
     last_log_date = None
     for r in results:
         artistname = shorten_by_word(r[0], 35)
         album = shorten_by_word(r[1], 35)
-        logdate = r[2]
+        datepurchased = r[2]
         source = r[3]
-        if logdate != last_log_date:
-            f.write("\n" + ("-" * 5) + " " + str(logdate) + " " + ("-" * 88) + "\n\n")
-        last_log_date = logdate
+        if datepurchased != last_log_date:
+            f.write("\n" + ("-" * 5) + " " + str(datepurchased) + " " + ("-" * 88) + "\n\n")
+        last_log_date = datepurchased
         line = "{:<40}{:<40}{:<10}\n".format(artistname.upper(), album, source)
 
         f.write(line)
