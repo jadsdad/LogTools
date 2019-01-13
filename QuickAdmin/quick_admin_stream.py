@@ -11,7 +11,7 @@ class QuickAdminForm(Ui_QuickAdmin):
     def __init__(self, ui):
         Ui_QuickAdmin.__init__(self)
         self.setupUi(ui)
-        self.conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8')
+        self.conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
         self.displayCount()
 
         self.populateArtCombo()

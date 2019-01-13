@@ -8,7 +8,7 @@ from datetime import date, timedelta
 from decimal import *
 
 basedir = str(Path.home()) + "/Charts"
-conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8')
+conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
 seperator = "-" * 100 + "\n"
 totalplays = 0
 totaltime = 0

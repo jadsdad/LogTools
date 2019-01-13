@@ -14,7 +14,7 @@ class QuickLogForm(Ui_Dialog):
         Ui_Dialog.__init__(self)
         self.setupUi(ui)
 
-        self.conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8')
+        self.conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
         self.logDate.setDate(QtCore.QDate.currentDate())
         self.populateArtCombo()
         self.populateAlbCombo()

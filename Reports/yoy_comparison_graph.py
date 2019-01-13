@@ -5,7 +5,7 @@ from pathlib import Path
 
 from datetime import date
 
-conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8')
+conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
 
 def query_db(sql):
     cursor = conn.cursor()
