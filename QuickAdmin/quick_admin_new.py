@@ -18,7 +18,7 @@ class QuickAdminForm(Ui_QuickAdmin):
         self.populateAlbCombo()
         self.populateTypeCombo()
         self.populateSourceCombo()
-        self.populateLabelCombo()
+        #self.populateLabelCombo()
 
         self.populateAlbumDetails()
         self.setTrackHeaders()
@@ -123,13 +123,13 @@ class QuickAdminForm(Ui_QuickAdmin):
     def setAlbumType(self):
         alb_id = self.getSelectedAlbum()
         c = self.conn.cursor()
-        c.execute("SELECT albumtypeid, sourceid, labelid, comments "
+        c.execute("SELECT albumtypeid, sourceid, comments "
                   "from album where albumid=%s;", (alb_id, ))
         typerow = c.fetchone()
         self.cmbType.setCurrentIndex(self.cmbType.findData(typerow[0]))
         self.cmbSource.setCurrentIndex(self.cmbSource.findData(typerow[1]))
-        self.cmbLabel.setCurrentIndex(self.cmbLabel.findData(typerow[2]))
-        self.txtEdition.setText(typerow[3])
+        #self.cmbLabel.setCurrentIndex(self.cmbLabel.findData(typerow[2]))
+        self.txtEdition.setText(typerow[2])
 
     @staticmethod
     def makeSafe(text):

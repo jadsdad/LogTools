@@ -146,7 +146,7 @@ def scan(basedir):
                     album_mbid = get_album_mbid(album_artist, album)
 
                 albumid = getAlbumID(album, year, album_artist)
-                removeStream(albumid)
+                resetToNew(albumid)
 
                 if albumid not in release_ids:
                     release_ids[albumid] = album_mbid
@@ -264,11 +264,13 @@ def getAlbumID(album, year, albumartist):
         return cursor.lastrowid
     else:
         row = cursor.fetchone()
-        return row[0]
+        albumid = row[0]
+        conn.cursor().execute("DELETE FROM Track WHERE albumid={};".format(albumid)).commit()
+        return albumid
 
-def removeStream(albumid):
+def resetToNew(albumid):
     cursor = conn.cursor()
-    sql = "UPDATE album SET AlbumTypeID=12, DateAdded=NOW(), SourceID=NULL where albumid={} AND albumtypeid=16;".format(albumid)
+    sql = "UPDATE album SET AlbumTypeID=12, DateAdded=NOW(), SourceID=NULL where albumid={};".format(albumid)
     cursor.execute(sql)
     conn.commit()
 

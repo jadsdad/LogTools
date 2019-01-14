@@ -63,7 +63,8 @@ class Ui_QuickAdmin(object):
         self.cmdSaveLabel = QtWidgets.QPushButton(QuickAdmin)
         self.cmdSaveLabel.setGeometry(QtCore.QRect(340, 530, 101, 24))
         self.cmdSaveLabel.setObjectName("cmdSaveLabel")
-
+        self.txtAddNewLabel.setEnabled(False)
+        self.cmdSaveLabel.setEnabled(False)
         self.retranslateUi(QuickAdmin)
         QtCore.QMetaObject.connectSlotsByName(QuickAdmin)
 

@@ -63,8 +63,8 @@ def shorten_by_word(text, length):
     return output
 
 def add_header():
-    linestr = "{:<20}{:<12}{:<50}{:<30}{:<10}{:>10}{:>5}{:>5}{:>5}{:>5}{:>5}\n".format(
-        "Type", "Year", "Album", "Label", "Source", "Length", "P", "D", "T", "B", "R")
+    linestr = "{:<20}{:<12}{:<80}{:<10}{:>10}{:>5}{:>5}{:>5}{:>5}{:>5}\n".format(
+        "Type", "Year", "Album", "Source", "Length", "P", "D", "T", "B", "R")
 
     f.write(linestr)
 
@@ -96,7 +96,7 @@ def main():
         albumlength, playcount, lastplayed, discs, tracks, bonus, artistcredit, rank = r[1:17]
 
 
-        album = shorten_by_word(album, 45)
+        album = shorten_by_word(album, 75)
         label = shorten_by_word(label, 25)
 
         if artist != currentartist:
@@ -121,8 +121,8 @@ def main():
             creditindex = creditslist.index(artistcredit)
             album += " ({})".format(creditindex)
 
-        linestr = "{:<20}{:<10}{:<2}{:<50}{:<30}{:<10}{:>10.0f}{:>5}{:>5}{:>5}{:>5}{:>5}\n".format("" if currenttype == albumtype else albumtype,
-                                                                                    yearreleased, "*" if playcount > 0 else " ", album, 'NULL' if label is None else label, source, albumlength / 60,
+        linestr = "{:<20}{:<10}{:<2}{:<80}{:<10}{:>10.0f}{:>5}{:>5}{:>5}{:>5}{:>5}\n".format("" if currenttype == albumtype else albumtype,
+                                                                                    yearreleased, "*" if playcount > 0 else " ", album, source, albumlength / 60,
                                                                                     playcount, discs, tracks, bonus, "-" if rank is None else rank)
 
         f.write(linestr)

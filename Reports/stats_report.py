@@ -625,7 +625,7 @@ def annual_stats():
     f.write("-" * 105 + "\n")
     sql = "select year(`log`.`logDate`) as Y, sum(`albumlengths`.`albumlength`) / 3600 AS `time`, count(`log`.`logID`) AS `logcount` " \
           "from `log` inner join `albumlengths` on `log`.`AlbumID` = `albumlengths`.`albumid` inner join album on albumlengths.albumid = album.albumid " \
-          "where album.sourceid <> 6 group by Y order by Y"
+          "group by Y order by Y"
     results = get_results(sql)
 
     for r in results:
@@ -652,7 +652,7 @@ def thisweek_stats():
     f.write("-" * 105 + "\n")
     sql = "select `log`.`logDate`, sum(`albumlengths`.`albumlength`) / 3600 AS `time`, count(`log`.`logID`) AS `logcount` " \
           "from `log` inner join `albumlengths` on `log`.`AlbumID` = `albumlengths`.`albumid` inner join album on albumlengths.albumid = album.albumid " \
-          "where (year(logDate) = year(CURRENT_DATE)) and (week(logDate) = week(CURRENT_DATE) and album.sourceid<>6) group by logDate order by logDate"
+          "where (year(logDate) = year(CURRENT_DATE)) and (week(logDate) = week(CURRENT_DATE)) group by logDate order by logDate"
     results = get_results(sql)
 
     for r in results:
@@ -768,8 +768,8 @@ def main():
     streamed_album_pc = streamcount / (albumcount + streamcount) * 100
     total_streams_pc = albumsstreamed / (logcount + albumsstreamed) * 100
 
-    f.write("{:<30}{:>10}{:>10.2f}%\n".format("Streamed Albums:", streamcount, streamed_album_pc))
-    f.write("{:<30}{:>10}{:>10.2f}%\n\n".format("Total Streams:", albumsstreamed, total_streams_pc))
+    f.write("{:<30}{:>10}{:>10.2f}%\n".format("Deleted Albums:", streamcount, streamed_album_pc))
+    f.write("{:<30}{:>10}{:>10.2f}%\n\n".format("No. Plays:", albumsstreamed, total_streams_pc))
 
 
     f.write("{:<30}{:>10.2f}\n\n".format("Total Size (GB):", total_size()))
@@ -796,8 +796,7 @@ def main():
     albums_by_type()
     albums_by_decade()
     albums_by_year()
-    albums_by_label()
-    albums_by_retailer()
+    # albums_by_label()
     albums_by_length()
 
     f.write("\n\n" + ("*" * 105) + "\n")
@@ -818,8 +817,6 @@ def main():
     top_ten_albums_bytime()
     top_ten_albums_bycount()
     top_ten_albums_last_28days()
-    top_ten_streams_bycount()
-
 
     f.write("\n\n" + ("*" * 105) + "\n")
     f.write("RE-RIP / RE-IMPORT\n")

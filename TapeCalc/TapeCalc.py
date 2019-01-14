@@ -24,6 +24,17 @@ class TapeCalcForm(Ui_Dialog):
         self.cmbLength.currentIndexChanged.connect(self.do_calculation)
         self.evenSides.stateChanged.connect(self.do_calculation)
         self.chkAllowBonus.stateChanged.connect(self.do_calculation)
+        self.cmdComplete.clicked.connect(self.markAsRecorded)
+
+
+    def markAsRecorded(self):
+        alb_id = int(self.cmbAlbum.itemData(self.cmbAlbum.currentIndex()))
+        c = self.conn.cursor()
+        c.execute("UPDATE album SET RecordedToCassette='Y' "
+                                       "WHERE albumid={};".format(alb_id))
+        self.conn.commit()
+
+        self.populateAlbCombo()
 
     def populateArtCombo(self):
         c = self.conn.cursor()
@@ -33,9 +44,10 @@ class TapeCalcForm(Ui_Dialog):
                   "INNER JOIN album on album.albumid = albumartist.albumid "
                   "WHERE album.sourceid in (4) AND album.AlbumTypeID <> 8 "
                   "AND album.albumid not in (select albumid from albums_missing_tracks) "
+                  "AND album.recordedtocassette is null "
                   "ORDER BY artistname;")
         artlist = c.fetchall()
-
+        self.cmbArtist.clear()
         for a in artlist:
             self.cmbArtist.addItem(a[1], a[0])
 
@@ -44,7 +56,7 @@ class TapeCalcForm(Ui_Dialog):
         c = self.conn.cursor()
         c.execute("SELECT album.albumid, album from album "
                   "inner join albumartist on album.albumid = albumartist.albumid "
-                  "WHERE artistid={} and SourceID in (4) AND "
+                  "WHERE artistid={} and SourceID in (4) AND recordedtocassette is null and "
                   "album.albumid not in (select albumid from albums_missing_tracks)"
                   "order by album;".format(art_id))
         alblist = c.fetchall()

@@ -46,6 +46,9 @@ class Ui_Dialog(object):
         self.label_4 = QtWidgets.QLabel(Dialog)
         self.label_4.setGeometry(QtCore.QRect(190, 70, 31, 20))
         self.label_4.setObjectName("label_4")
+        self.cmdComplete = QtWidgets.QPushButton(Dialog)
+        self.cmdComplete.setGeometry(QtCore.QRect(340, 70, 71, 51))
+        self.cmdComplete.setObjectName("cmdComplete")
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -59,4 +62,6 @@ class Ui_Dialog(object):
         self.evenSides.setText(_translate("Dialog", "Aim for even sides"))
         self.chkAllowBonus.setText(_translate("Dialog", "Include Bonus Tracks"))
         self.label_4.setText(_translate("Dialog", "Extra"))
+        self.cmdComplete.setText(_translate("Dialog", "Recording\n"
+"Complete"))
 
