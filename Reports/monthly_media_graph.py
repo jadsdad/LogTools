@@ -27,7 +27,7 @@ total = []
 index=1
 for y in range(2018, date.today().year + 1):
     outfile = str(Path.home()) + "/Charts/Yearly/Media Comparison - {}.pdf".format(y)
-    for media in ['Vinyl','CD','Digital','Cassette','Streamed']:
+    for media in ['Vinyl','CD','Digital','Cassette']:
         dataplot = []
         monthplot = []
         data = get_mediastats(media, y)

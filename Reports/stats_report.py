@@ -4,6 +4,8 @@ import os
 import sys
 import os
 from pathlib import Path
+from datetime import timedelta
+import decimal
 
 conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
 
@@ -579,10 +581,10 @@ def monthly_stats():
         y = str(r[0]) + "-" + str(r[1]).zfill(2)
         missing = missing_logs_month(r[0],r[1])
         count = int(r[3])
-        logtime = r[2]
-        avg = ((logtime * 60) / count)
+        logtime = format_to_HM(r[2])
+        avg = format_to_MS(((r[2] * 60) / count))
         total = count + missing
-        line = "{:<30}{:>10}{:>10.2f}{:>20.2f}{:>11}{:>11}\n".format(y, count, logtime, avg, missing, total)
+        line = "{:<30}{:>10}{:>10}{:>20}{:>11}{:>11}\n".format(y, count, logtime, avg, missing, total)
 
         f.write(line)
 
@@ -605,10 +607,10 @@ def weekly_stats():
         y = str(r[0]) + "-" + str(r[1]).zfill(2)
         missing = missing_logs_week(r[0],r[1])
         count = int(r[3])
-        logtime = r[2]
-        avg = ((logtime * 60) / count)
+        logtime = format_to_HM(r[2])
+        avg = format_to_MS(((r[2] * 60) / count))
         total = count + missing
-        line = "{:<30}{:>10}{:>10.2f}{:>20.2f}{:>11}{:>11}\n".format(y, count, logtime, avg, missing, total)
+        line = "{:<30}{:>10}{:>10}{:>20}{:>11}{:>11}\n".format(y, count, logtime, avg, missing, total)
 
         f.write(line)
 
@@ -632,10 +634,10 @@ def annual_stats():
         y = r[0]
         missing = missing_logs_year(y)
         count = int(r[2])
-        logtime = r[1]
-        avg = ((logtime * 60) / count)
+        logtime = format_to_HM(r[1])
+        avg = format_to_MS(((r[1] * 60) / count))
         total = count + missing
-        line = "{:<30}{:>10}{:>10.2f}{:>20.2f}{:>11}{:>11}\n".format(y, count, logtime, avg, missing, total)
+        line = "{:<30}{:>10}{:>10}{:>20}{:>11}{:>11}\n".format(y, count, logtime, avg, missing, total)
 
         f.write(line)
 
@@ -659,10 +661,10 @@ def thisweek_stats():
         logdate = r[0].strftime("%Y-%m-%d")
         missing = missing_logs_date(logdate)
         count = int(r[2])
-        logtime = r[1]
-        avg = ((logtime * 60) / count)
+        logtime = format_to_HM(r[1])
+        avg = format_to_MS(((r[1] * 60) / count))
         total = count + missing
-        line = "{:<30}{:>10}{:>10.2f}{:>20.2f}{:>11}{:>11}\n".format(logdate, count, logtime, avg, missing, total)
+        line = "{:<30}{:>10}{:>10}{:>20}{:>11}{:>11}\n".format(logdate, count, logtime, avg, missing, total)
 
         f.write(line)
 
@@ -731,7 +733,19 @@ def get_media_count(physical):
     results = get_results(sql)
     return results[0][0]
 
+def format_to_HM(hours):
+    if type(hours) == decimal.Decimal:
+        hours = float(hours)
 
+    mytime = timedelta(hours=hours)
+    return "{:3d}:{:02d}".format(int(mytime.total_seconds() // 3600), int((mytime.total_seconds() % 3600) //60))
+
+def format_to_MS(minutes):
+    if type(minutes) == decimal.Decimal:
+        minutes = float(minutes)
+
+    mytime = timedelta(minutes=minutes)
+    return "{:2d}:{:02d}".format(int(mytime.seconds // 60), int(mytime.seconds % 60))
 
 def main():
     global albumcount
