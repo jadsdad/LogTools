@@ -2,7 +2,8 @@ import MySQLdb as MariaDB
 import io
 import sys
 from pathlib import Path
-from datetime import date
+from datetime import date, timedelta
+from decimal import Decimal
 
 conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
 
@@ -75,6 +76,12 @@ def add_credits(creditslist):
         f.write("({}) {}\n".format(index, c))
         index += 1
 
+def format_to_MS(seconds):
+    if type(seconds) == Decimal:
+        seconds = float(seconds)
+
+    mytime = timedelta(seconds=seconds)
+    return "{:2d}:{:02d}".format(int(mytime.seconds // 60), int(mytime.seconds % 60))
 
 def main():
     openreportfile()
@@ -121,8 +128,8 @@ def main():
             creditindex = creditslist.index(artistcredit)
             album += " ({})".format(creditindex)
 
-        linestr = "{:<20}{:<10}{:<2}{:<80}{:<10}{:>10.0f}{:>5}{:>5}{:>5}{:>5}{:>5}\n".format("" if currenttype == albumtype else albumtype,
-                                                                                    yearreleased, "*" if playcount > 0 else " ", album, source, albumlength / 60,
+        linestr = "{:<20}{:<10}{:<2}{:<80}{:<10}{:>10}{:>5}{:>5}{:>5}{:>5}{:>5}\n".format("" if currenttype == albumtype else albumtype,
+                                                                                    yearreleased, "*" if playcount > 0 else " ", album, source, format_to_MS(albumlength),
                                                                                     playcount, discs, tracks, bonus, "-" if rank is None else rank)
 
         f.write(linestr)
