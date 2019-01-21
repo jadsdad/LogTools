@@ -9,7 +9,7 @@ from decimal import *
 
 basedir = str(Path.home()) + "/Charts"
 conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
-seperator = "-" * 100 + "\n"
+seperator = "-" * 125 + "\n"
 totalplays = 0
 totaltime = 0
 
@@ -25,7 +25,7 @@ def get_total_plays():
     return results[0][0]
 
 def get_total_albums():
-    sql = "SELECT COUNT(*) FROM album where SourceID<>6;"
+    sql = "SELECT COUNT(*) FROM album where SourceID<>6 and played=1;"
     results = get_results(sql)
     return results[0][0]
 
@@ -75,8 +75,11 @@ def generate_chart(outfile, data, basedir):
 
     if len(data) > 0:
         f = io.open(os.path.join(basedir, outfile), "w", encoding='utf-8')
+        header = "{:<5}{:<80}{:>10}{:>10}{:>10}\n".format("RANK","","TIME","FREQ","TOTAL")
         f.write(seperator)
-        datadict = {}
+        f.write(header)
+        f.write(seperator)
+        datadict = []
         rank = 1
         for dataline in data:
             textline = ""
@@ -85,16 +88,17 @@ def generate_chart(outfile, data, basedir):
             logcount = int(dataline[3])
             albcount = int(get_albums_by_artist(art))
             artplayed = int(get_played_by_artist(art))
-            weighted_score = (((logtime / totaltime) * 0.5) + \
-                             ((logcount / totalplays) * 0.5)) * 100000
+            timeshare = (logtime / totaltime) * 100
+            freqshare = (logcount / totalplays) * 100
+            weighted_score = ((timeshare * 0.5) +(freqshare * 0.5))
+            datadict_line = [art, timeshare, freqshare, weighted_score]
+            datadict.append(datadict_line)
 
-            datadict[art] = weighted_score
+        s = sorted(datadict, key=lambda x: x[3], reverse=True)
 
-        s = [(k, datadict[k]) for k in sorted(datadict, key=datadict.get, reverse=True)]
-
-        for key, value in s:
-            textline = "{:<5}{:<80}{:>10.2f}\n".format(rank, key, datadict[key])
-
+        for row in s:
+            art, timeshare, freqshare, score = row[:4]
+            textline = "{:<5}{:<80}{:>10.2f}{:>10.2f}{:>10.2f}\n".format(rank, art, timeshare, freqshare, score)
             f.write(textline)
             f.write(seperator)
             rank += 1
