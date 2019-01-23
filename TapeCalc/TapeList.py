@@ -34,10 +34,12 @@ def get_tracks(albumid):
     return query_db(sql)
 
 def get_albums():
-    sql = "SELECT albumid, artistcredit, album FROM album " \
+    sql = "SELECT album.albumid, artistname, album " \
+          "FROM album INNER JOIN albumartist on album.albumid = albumartist.albumid " \
+          "INNER JOIN artist on albumartist.artistid = artist.artistid " \
           "WHERE sourceid=4 and albumtypeid<>7 " \
           "and recordedtocassette is null  " \
-          "order by artistcredit, album;"
+          "order by SortName, yearreleased, album;"
     return query_db(sql)
 
 def willfit(tracks, sidelength):
