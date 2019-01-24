@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 
-import MySQLdb as mariadb
+import logtools_common
 import sys
 from tapecalcui import Ui_Dialog
 from PyQt5 import QtCore, QtWidgets
-
-conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
 
 class TapeCalcForm(Ui_Dialog):
     def __init__(self, ui, conn):
@@ -268,6 +266,7 @@ class Calculator:
 
 
 if __name__ == "__main__":
+    conn = logtools_common.conn
     app = QtWidgets.QApplication(sys.argv)
     dialog = QtWidgets.QDialog()
     prog = TapeCalcForm(dialog, conn)

@@ -1,23 +1,14 @@
-import MySQLdb as mariadb
 from pathlib import Path
 import os
 import io
-import shutil
-import filecmp
-from datetime import date, timedelta
-from decimal import *
+import logtools_common as common
 
 basedir = str(Path.home()) + "/Charts"
-conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
+conn = common.conn
 seperator = "-" * 125 + "\n"
 totalplays = 0
 totaltime = 0
 
-
-def query_db(sql):
-    cursor = conn.cursor()
-    cursor.execute(sql)
-    return cursor.fetchall()
 
 def get_total_plays():
     sql = "SELECT SUM(playcount) FROM album where SourceID<>6;"
@@ -66,7 +57,7 @@ def get_data(query, condition=None):
 
     sql += "LIMIT 100;".format(query.lower())
 
-    return query_db(sql)
+    return common.get_results(sql)
 
 def generate_chart(outfile, data, basedir):
     totalplays = int(get_total_plays())

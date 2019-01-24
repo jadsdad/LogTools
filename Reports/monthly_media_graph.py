@@ -1,15 +1,10 @@
 import matplotlib.pyplot as plt
-import MySQLdb as mariadb
-import io
 from pathlib import Path
 from datetime import date
+import logtools_common as common
 
-conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
+conn = common.conn
 
-def query_db(sql):
-    cursor = conn.cursor()
-    cursor.execute(sql)
-    return cursor.fetchall()
 
 def get_mediastats(media, y):
     sql = "SELECT YEAR(log.logdate) as Y, " \
@@ -19,19 +14,17 @@ def get_mediastats(media, y):
           "inner join source on album.SourceID = source.sourceid " \
           "WHERE source = '{}' and year(log.logdate)={} " \
           "GROUP BY Y, M, Source ORDER BY logdate, Source;".format(media, y)
-    results = query_db(sql)
+    results = common.get_results(sql)
     return results
 
+
 def run():
-    total = []
-    index=1
     for y in range(2018, date.today().year + 1):
         outfile = str(Path.home()) + "/Charts/Yearly/Media Comparison - {}.pdf".format(y)
         for media in ['Vinyl','CD','Digital','Cassette']:
             dataplot = []
             monthplot = []
             data = get_mediastats(media, y)
-            t = 0
             for d in data:
                 m = d[1]
                 t = d[3]

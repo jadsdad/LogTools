@@ -1,11 +1,9 @@
 import matplotlib.pyplot as plt
-import MySQLdb as mariadb
-import io
 from pathlib import Path
-
+import logtools_common as common
 from datetime import date
 
-conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
+conn = common.conn
 
 def query_db(sql):
     cursor = conn.cursor()
@@ -20,7 +18,6 @@ def get_weekstats(y):
 def run():
     outfile = str(Path.home()) + "/Charts/YOY Comparison.pdf"
 
-    monthrange=range(1, 12)
     total = []
 
     for y in range(2018, date.today().year + 1):

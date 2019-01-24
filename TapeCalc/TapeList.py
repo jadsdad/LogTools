@@ -1,11 +1,9 @@
-import MySQLdb as mariadb
-from decimal import Decimal
-from datetime import timedelta
 from pathlib import Path
 import io
 import sys
+import logtools_common as common
 
-conn = mariadb.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
+conn = common.conn
 
 class Side():
     def __init__(self, index, trackfrom, trackto, time):
@@ -19,19 +17,15 @@ class Tape():
         self.name = name
         self.sidelength = sidelength
 
-def query_db(sql):
-    cursor = conn.cursor()
-    cursor.execute(sql)
-    return cursor.fetchall()
 
 def get_albumlength(albumid):
     sql = "SELECT albumlength FROM albumlengths WHERE albumid={};".format(albumid)
-    return float(query_db(sql)[0][0])
+    return float(common.get_results(sql)[0][0])
 
 def get_tracks(albumid):
     sql = "SELECT tracklength FROM tracklengths WHERE albumid={} AND bonustrack = 0 " \
           "ORDER BY Disc, Track;".format(albumid)
-    return query_db(sql)
+    return common.get_results(sql)
 
 def get_albums():
     sql = "SELECT album.albumid, artistname, album " \
@@ -40,7 +34,7 @@ def get_albums():
           "WHERE sourceid=4 and albumtypeid<>7 " \
           "and recordedtocassette is null  " \
           "order by SortName, yearreleased, album;"
-    return query_db(sql)
+    return common.get_results(sql)
 
 def willfit(tracks, sidelength):
     for t in tracks:
@@ -52,7 +46,7 @@ def willfit(tracks, sidelength):
 def calculate(albumid, tape):
     sides=[]
     tracks = get_tracks(albumid)
-    albumlength = get_albumlength(albumid) / 60
+    albumlength = get_albumlength(albumid)
     sidetarget = int(albumlength / tape.sidelength) + 1
     minsidelength = (albumlength / sidetarget) * 0.75
     tgtsidelength = (albumlength / sidetarget)
@@ -68,9 +62,9 @@ def calculate(albumid, tape):
     starttrack = 1
     waste = 0
     for t in tracks:
-        tracklength = t[0] / 60
+        tracklength = t[0]
         if trackindex + 1 < len(tracks):
-            readahead = tracks[trackindex + 1][0] / 60
+            readahead = tracks[trackindex + 1][0]
         else:
             readahead = 0
 
@@ -98,17 +92,11 @@ def calculate(albumid, tape):
 
     return tape, will_fit, sidecount, albumlength, minside, maxside, maxside - minside, waste, sides
 
-def format_to_MS(minutes):
-    if type(minutes) == Decimal:
-        minutes = float(minutes)
-
-    mytime = timedelta(minutes=minutes)
-    return "{:2d}:{:02d}".format(int(mytime.total_seconds() // 60), int(mytime.total_seconds() % 60))
 
 def generate_report(extension):
-    tapes = [Tape("C90", 45 + extension),
-             Tape("C60", 30 + extension),
-             Tape("C46", 23 + extension)]
+    tapes = [Tape("C90", 60 * (45 + extension)),
+             Tape("C60", 60 * (30 + extension)),
+             Tape("C46", 60 * (23 + extension))]
 
     albums = get_albums()
     f = io.open(str(Path.home()) + "/Charts/TapeList.txt", "w", encoding='utf-8')
@@ -148,13 +136,13 @@ def generate_report(extension):
             if x is not None:
                 tape, will_fit, sidecount, albumlength, minside, maxside, difference, waste, sides = best_tape
                 f.write("{:<80}{:>10}{:>10}{:>10}{:>10}{:>10}{:>10}{:>10}\n".format(title[:75],
-                                                        format_to_MS(albumlength), tape.name, sidecount,
-                                                        format_to_MS(minside), format_to_MS(maxside),
-                                                        format_to_MS(difference), format_to_MS(waste)))
+                                                        common.format_to_MS(albumlength), tape.name, sidecount,
+                                                        common.format_to_MS(minside), common.format_to_MS(maxside),
+                                                        common.format_to_MS(difference), common.format_to_MS(waste)))
                 if sidecount > 1:
                     f.write("\n")
                     for s in sides:
-                        f.write("\t\tSide {} - Tracks {} to {} - {}\n".format(s.index, s.trackfrom, s.trackto, format_to_MS(s.time)))
+                        f.write("\t\tSide {} - Tracks {} to {} - {}\n".format(s.index, s.trackfrom, s.trackto, common.format_to_MS(s.time)))
 
                 f.write("\n")
 

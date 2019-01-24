@@ -1,13 +1,10 @@
-import MySQLdb as MariaDB
 import io
-import sys
 from pathlib import Path
-from datetime import date, timedelta
-from decimal import Decimal
-
-conn = MariaDB.connect(db='catalogue', use_unicode=True, charset='utf8', read_default_file='~/.my.cnf')
+from datetime import date
+import logtools_common
 
 f = None
+conn = logtools_common.conn
 
 def openreportfile():
     global f
@@ -48,21 +45,6 @@ def add_relationships(artistid, isgroup):
             rowindex += 1
         f.write("\n")
 
-def shorten_by_word(text, length):
-    if text is None:
-        return None
-
-    wordsplit = text.split(" ")
-    output = ""
-    for w in wordsplit:
-        if len(output) + len(w) < length:
-            if len(output) > 0:
-                output += " "
-            output += w
-        else:
-            return output
-    return output
-
 def add_header():
     linestr = "{:<20}{:<12}{:<80}{:<10}{:>10}{:>5}{:>5}{:>5}{:>5}{:>5}\n".format(
         "Type", "Year", "Album", "Source", "Length", "P", "D", "T", "B", "R")
@@ -75,13 +57,6 @@ def add_credits(creditslist):
     for c in creditslist[1:len(creditslist)]:
         f.write("({}) {}\n".format(index, c))
         index += 1
-
-def format_to_MS(seconds):
-    if type(seconds) == Decimal:
-        seconds = float(seconds)
-
-    mytime = timedelta(seconds=seconds)
-    return "{:2d}:{:02d}".format(int(mytime.seconds // 60), int(mytime.seconds % 60))
 
 def main():
     openreportfile()
@@ -103,8 +78,8 @@ def main():
         albumlength, playcount, lastplayed, discs, tracks, bonus, artistcredit, rank = r[1:17]
 
 
-        album = shorten_by_word(album, 75)
-        label = shorten_by_word(label, 25)
+        album = logtools_common.shorten_by_word(album, 75)
+        label = logtools_common.shorten_by_word(label, 25)
 
         if artist != currentartist:
             if len(creditslist) > 1:
@@ -129,7 +104,7 @@ def main():
             album += " ({})".format(creditindex)
 
         linestr = "{:<20}{:<10}{:<2}{:<80}{:<10}{:>10}{:>5}{:>5}{:>5}{:>5}{:>5}\n".format("" if currenttype == albumtype else albumtype,
-                                                                                    yearreleased, "*" if playcount > 0 else " ", album, source, format_to_MS(albumlength),
+                                                                                    yearreleased, "*" if playcount > 0 else " ", album, source, logtools_common.format_to_MS(albumlength),
                                                                                     playcount, discs, tracks, bonus, "-" if rank is None else rank)
 
         f.write(linestr)
